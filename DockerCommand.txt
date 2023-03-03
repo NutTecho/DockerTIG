@@ -1,0 +1,26 @@
+#check version docker
+docker --version
+
+#check image in docker
+docker images
+docker image ls
+
+#check container in docker
+docker ps
+docker ps -a
+docker container
+docker container ls -a
+
+#docker run mode
+-it => run iterctive
+--rm => remove container after stop
+-d => run background service
+
+#run remove & iteractive container
+docker run --rm -it [--container name--]
+
+#docker remove after stop
+docker run --rm --name [container name] -p [port]:[port] -e
+
+#docker execute in to container
+docker exec -it [container name] bash

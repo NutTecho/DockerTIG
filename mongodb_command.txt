@@ -1,0 +1,45 @@
+db => show all database
+show dbs => show usage database
+use [dbname] => use database
+db.dropDatabase()
+db.[collectionname].drop()
+db.createCollection("xxxxx") => create createCollection
+show collections => show collection in database
+db.student.insert({"name":"tomas"})
+db.createCollection("mycol", { capped : true, 
+                                autoIndexID : true, 
+                                size : 6142800,
+                                max : 10000 } )
+db.student.find() => query get data all
+db.student.find({name : 'xxxx'}) => query with condition
+db.student.find({name : 'xxxx'}).pretty() => reformat to look eazy
+
+db.student.insert({"name":"Maco","age":15,"class":"B","skill":"rock"})
+db.student.find({'age' : {$XX : 15} }).pretty() 
+        $XX is variable condition
+        example : $lt => less than
+                $lte => less than equal
+                $gt = > greater than
+                $gte => greater than equal
+                $ne => not equal
+                $in => values in an array
+                $nin => values not in an array
+
+db.student.find({$and :  [ {age : }  ,  {  : } ]})
+db.student.find({$or :  [ {age : }  ,  {  : } ]})
+
+db.student.update({name:'xxxx'},{$set : {'age' : 15}})
+db.student.update({name:'xxxx'},{$set : {'age' : 15}},{multi : true})
+
+db.student.remove({'name' : 'xxxx'},1) => remove 1
+db.student.remove({}) => remove all
+
+db.student.find().limit()
+db.student.find().sort({'age' : -1}) => descending 
+
+db.student.aggregate([{$group : { _id : "$by_user",num_tutorial : {$sum : "$age"}}}])
+db.student.aggregate([{$group : { _id : "$by_user",age_avg : {$avg : "$age"}}}])
+
+db.student.find({'skill': {$regex : 'f'}}).pretty()
+db.student.find({'skill': {$regex : 'f',$option : '$i'}}) => case insensitive
+

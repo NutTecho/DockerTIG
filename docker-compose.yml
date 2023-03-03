@@ -1,0 +1,164 @@
+version: '3.7'
+services: 
+  # influxdb:
+  #   container_name: influxdb
+  #   image: "influxdb:1.8"
+  #   ports: 
+  #     - 8086:8086
+  #   networks: 
+  #     tignetwork:
+  #       ipv4_address: 172.22.0.3
+  #   environment: 
+  #     INFLUXDB_HTTP_AUTH_ENABLE : "true"
+  #     INFLUXDB_DB : "iot"
+  #     INFLUXDB_ADMIN_USER : "admin"
+  #     INFLUXDB_ADMIN_PASSWORD : "influx"
+  #   volumes: 
+  #     - ./influxdb:/var/lib/influxdb:rw
+  #   restart: always
+
+  influxdb2:
+    image: influxdb:2.6-alpine
+    container_name: influxdb2
+    ports:
+      - "8086:8086"
+    volumes:
+      - type: bind
+        source: ./influxdb2/data
+        target: /var/lib/influxdb2
+      - type: bind
+        source: ./influxdb2/config
+        target: /etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=influxdb123
+      - DOCKER_INFLUXDB_INIT_ORG=KMITL
+      - DOCKER_INFLUXDB_INIT_BUCKET=mybucket
+      - DOCKER_INFLUXDB_INIT_RETENTION=1w
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=Oh0wYUWAeapaxMvLSQJvxzsJxYYgQHvEZOcrmpq4S_MSp1ZFPa1XDmj1_ZqBQP4ez22ceGGoeF-7J1wzjw1_tw==
+    restart: always
+    networks: 
+      tignetwork:
+        ipv4_address: 172.22.0.3
+
+
+  grafana:
+    container_name: grafana
+    image: "grafana/grafana"
+    ports:
+      - 3000:3000
+    networks: 
+      tignetwork:
+        ipv4_address: 172.22.0.2
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./grafana:/var/lib/grafana:rw
+    restart: always
+
+  telegraf:
+    container_name: telegraf
+    image: "telegraf"
+    ports:
+      - "8092:8092"
+      - "8094:8094"
+      - "8125:8125"
+    depends_on:
+     - "influxdb2"
+     - "emqx"
+    networks: 
+      tignetwork:
+        ipv4_address: 172.22.0.4
+    volumes:
+      - ./telegraf2/telegraf.conf:/etc/telegraf/telegraf.conf:rw
+    restart: always
+
+  # mosquitto:
+  #   container_name: mosquitto
+  #   image: eclipse-mosquitto
+  #   restart: always
+  #   volumes:
+  #     - ./mqtt/conf:/mosquitto/config
+  #     - ./mqtt/data:/mosquitto/data
+  #     - ./mqtt/log:/mosquitto/log
+  #   expose:
+  #     - 1883
+  #     - 9001
+  #   ports:
+  #     - 1883:1883
+  #     - 9001:9001
+  #   networks:
+  #     tignetwork:
+  #       ipv4_address: 172.22.0.5
+
+# user admin password admin1234 , default public
+  emqx:
+    image: emqx/emqx
+    container_name: emqx
+    restart: always
+    environment:
+    - "EMQX_NODE_NAME=emqx@node1.emqx.com"
+    - "EMQX_CLUSTER__DISCOVERY_STRATEGY=static"
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx_ctl", "status"]
+      interval: 5s
+      timeout: 25s
+      retries: 5
+    networks:
+      tignetwork:
+        ipv4_address: 172.22.0.5
+    ports:
+      - 1883:1883
+      # - 8083:8083
+      # - 8084:8084
+      # - 8883:8883
+      - 18083:18083 
+    volumes:
+      - ./emqx/data:/opt/emqx/data
+      - ./emqx/config:/etc/emqx/etc
+
+# prometheus:
+#     image: prom/prometheus:latest
+#     volumes:
+#       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#     command:
+#      - '--config.file=/etc/prometheus/prometheus.yml'
+#     ports:
+#       - '9090:9090'
+#     restart: always
+
+    # environment: 
+    #   - HOST_PROC=./telegraf2/host/proc
+    #   - HOST_SYS=./telegraf2/host/sys
+    #   - HOST_ETC=./telegraf2/host/etc
+      # HOST_NAME : "telegraf"
+      # INFLUXDB_HOST : "influxdb"
+      # INFLUXDB_PORT : "8086"
+      # DATABASE : "iot"
+    # privileged: true
+    # tty : true
+
+networks: 
+ tignetwork:
+   driver : bridge
+   ipam:
+      config:
+        - subnet: 172.22.0.0/16
+          # gateway: 172.20.0.1
+          #docker-compose v3+ do not use ip_range
+          # ip_range: 172.28.5.0/24
+
+# volumes:
+#  influxdb-data:
+#  grafana-data:
+#  telegraf-data:
+
+
+
+
+# docker run --rm telegraf:latest telegraf config > ./telegraf2/telegraf.conf:rw
+
+
+

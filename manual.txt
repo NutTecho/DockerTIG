@@ -1,0 +1,24 @@
+docker exec -it influxdb influxdb
+- CREATE DATABASE iot
+- USE iot
+- CREATE USER admin WITH PASSWORD 'influx' WITH ALL PROVILAGES
+- GRANT ALL ON iot TO telegraf
+
+
+docker exec -it mosquitto 
+- mosquitto_passwd -c <password file> <user_name> 
+====== -c means as file will be overwritten =======
+====== no -c is add more user =========
+======= -D is remove file ==============
+
+- mosquitto_passwd <password file> <username> <password>
+======= update username password ===============
+
+- mosquitto_passwd -U <password file>
+======== recieve user & password from file ============
+
+- mosquitto_passwd -c /mosquitto/config/passwd.txt admin
+======= mosquitto automatic convert passwd to encode ======= 
+
+password_file <path to the configuration file>
+- gedit /etc/mosquitto/mosquitto.conf

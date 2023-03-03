@@ -1,0 +1,12 @@
+==== create user =======
+mosquitto -c <file_path> <user>
+mosquitto_passwd -c mosquitto/config/passwd admin
+
+
+===== add user ====
+mosquitto <file_path> <user>
+mosquitto_passwd mosquitto/config/passwd admin
+
+===== remove user ====
+mosquitto -d <file_path> <user>
+mosquitto_passwd -d mosquitto/config/passwd admin

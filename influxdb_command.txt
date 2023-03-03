@@ -1,0 +1,47 @@
+====== Concept ==========
+Database => Database
+Measure => table
+Tags => Index Table Columns
+Fields => Non-index Table Column
+Shards => Shard Group
+Retention
+===========================
+
+influx -host 127.0.0.1 -port 8086 -username admin -password 12345
+
+> SHOW DATABASES;
+> CREATE DATABASE test;
+> USE test;
+
+> INSERT <MEASUREMENTS>,<TAG> = <VALUE>,<TAG> = <VALUE>
+> INSERT temperature,machine=unit42,type=assembly external=25,internal=37
+> INSERT temperature,machine=unit43,type=assembly external=25,internal=37
+> INSERT temperature,machine=unit43,type=not_assembly external=25,internal=37
+
+> select * from "temperature" => get data with measurements temperature
+> SELECT "internal"::field, "machine"::tag FROM temperature WHERE "machine" = 'unit42'
+> DELETE FROM "temperature" WHERE time < '2000-01-01T00:00:00Z'
+> DROP MEASUREMENT "temperature"
+
+> EXPLAIN SELECT * FROM temperature => show info when query
+
+> SHOW MEASUREMENTS
+ - temperature
+
+> SHOW TAG KEY => show all taa in measure
+    - machine
+    - type
+    - external
+    - internal
+> SHOW TAG KEY FROM "CPU" => show tag key only measurement "cpu"
+
+> SHOW FIELD KEYS FROM "CPU" => show type only numeric data
+    - VALUE (TYPE FLOAT)
+
+> SHOW TAG VALUES FROM "CPU" WITH KEY IN ("REGION")
+> SHOW TAG VALUES ON <DATABASE_NAME> FROM "CPU" WITH KEY IN ("REGION")
+
+> SHOW RETENTION POLICIES => show live time setting (default 168 hr = 7 days)
+
+> SHOW SHARDS => default is autogen
+> SHOW SHARD GROUPS
