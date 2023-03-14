@@ -151,7 +151,24 @@ services:
       tignetwork:
         ipv4_address: 172.22.0.6
 
-   # postgres:
+  
+networks: 
+  tignetwork:
+    name: tignetwork
+    driver : bridge
+    ipam:
+        config:
+          - subnet: 172.22.0.0/16
+            # gateway: 172.20.0.1
+            #docker-compose v3+ do not use ip_range
+            # ip_range: 172.28.5.0/24
+
+# volumes:
+#  influxdb-data:
+#  grafana-data:
+#  telegraf-data:
+
+# postgres:
   #   container_name: postgres
   #   image: postgres
   #   restart: unless-stopped
@@ -197,44 +214,26 @@ services:
   #     tignetwork:
   #       ipv4_address: 172.22.0.13
 
-# prometheus:
-#     image: prom/prometheus:latest
-#     volumes:
-#       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-#     command:
-#      - '--config.file=/etc/prometheus/prometheus.yml'
-#     ports:
-#       - '9090:9090'
-#     restart: always
+  # prometheus:
+  #     image: prom/prometheus:latest
+  #     volumes:
+  #       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #     command:
+  #      - '--config.file=/etc/prometheus/prometheus.yml'
+  #     ports:
+  #       - '9090:9090'
+  #     restart: always
 
-    # environment: 
-    #   - HOST_PROC=./telegraf2/host/proc
-    #   - HOST_SYS=./telegraf2/host/sys
-    #   - HOST_ETC=./telegraf2/host/etc
-      # HOST_NAME : "telegraf"
-      # INFLUXDB_HOST : "influxdb"
-      # INFLUXDB_PORT : "8086"
-      # DATABASE : "iot"
-    # privileged: true
-    # tty : true
-
-networks: 
- tignetwork:
-   name: tignetwork
-   driver : bridge
-   ipam:
-      config:
-        - subnet: 172.22.0.0/16
-          # gateway: 172.20.0.1
-          #docker-compose v3+ do not use ip_range
-          # ip_range: 172.28.5.0/24
-
-# volumes:
-#  influxdb-data:
-#  grafana-data:
-#  telegraf-data:
-
-
+  # environment: 
+  #   - HOST_PROC=./telegraf2/host/proc
+  #   - HOST_SYS=./telegraf2/host/sys
+  #   - HOST_ETC=./telegraf2/host/etc
+    # HOST_NAME : "telegraf"
+    # INFLUXDB_HOST : "influxdb"
+    # INFLUXDB_PORT : "8086"
+    # DATABASE : "iot"
+  # privileged: true
+  # tty : true
 
 
 # docker run --rm telegraf:latest telegraf config > ./telegraf2/telegraf.conf:rw
@@ -244,20 +243,6 @@ networks:
 
 # https://app.slack.com/block-kit-builder/
 # curl -X POST -H 'Content-type: application/json' --data '{
-# 	"blocks": [
-# 		{
-# 			"type": "section",
-# 			"text": {
-# 				"type": "mrkdwn",
-# 				"text": "Alert test"
-# 			}
-# 		},
-# 		{
-# 			"type": "image",
-# 			"image_url": "D:\VSCODE\Docker_Project\DockerTIG\grafana\png\PJa4b67QHodGRDZR3P4P.png",
-# 			"alt_text": "inspiration"
-# 		}
-# 	]
 # }' https://hooks.slack.com/services/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
 
 
