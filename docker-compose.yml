@@ -54,9 +54,26 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_RENDERING_CALLBACK_URL: http://172.22.0.2:3000/
+      GF_RENDERING_SERVER_URL: http://172.22.0.7:8081/render
+      GF_LOG_FILTERS: rendering:debug
     volumes:
       - ./grafana:/var/lib/grafana:rw
+      - ./grafana/config.ini:/usr/share/grafana/conf/defaults.ini:rw
+   
     restart: always
+
+  renderer:
+    container_name: renderer
+    image: grafana/grafana-image-renderer:latest
+    restart: always
+    ports:
+      - 8081:8081
+    volumes:
+      - ./grafana_render/config.json:/usr/src/app/config.json
+    networks: 
+      tignetwork:
+        ipv4_address: 172.22.0.7
 
   telegraf:
     container_name: telegraf
@@ -111,13 +128,74 @@ services:
         ipv4_address: 172.22.0.5
     ports:
       - 1883:1883
-      # - 8083:8083
-      # - 8084:8084
-      # - 8883:8883
+      - 8083:8083
+      - 8084:8084
+      - 8883:8883
       - 18083:18083 
     volumes:
       - ./emqx/data:/opt/emqx/data
       - ./emqx/config:/etc/emqx/etc
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./portainer:/data
+    ports:
+      - 9000:9000
+    networks:
+      tignetwork:
+        ipv4_address: 172.22.0.6
+
+   # postgres:
+  #   container_name: postgres
+  #   image: postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: admin
+  #   volumes:
+  #     - ./postgres:/var/lib/postgresql/data
+  #   ports:
+  #     - 5432:5432
+  #   networks:
+  #     postgres:
+  #       ipv4_address: 172.21.0.2
+
+  # timescaledb:
+  #   container_name: timescaledb
+  #   image: timescale/timescaledb-ha:pg14-latest
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: admin
+  #   volumes:
+  #     - ./timescale:/home/postgres/
+  #   # /var/lib/postgresql/data/postgresql.conf
+  #   ports:
+  #     - 5432:5432
+  #   networks:
+  #     tignetwork:
+  #       ipv4_address: 172.22.0.14
+ 
+  # pgadmin:
+  #   container_name: pgadmin
+  #   image: dpage/pgadmin4
+  #   restart: unless-stopped
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: user@domain.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #   ports:
+  #   - 5050:80
+  #   volumes:
+  #   - ./pgadmin:/var/lib/pgadmin
+  #   networks:
+  #     tignetwork:
+  #       ipv4_address: 172.22.0.13
 
 # prometheus:
 #     image: prom/prometheus:latest
@@ -142,6 +220,7 @@ services:
 
 networks: 
  tignetwork:
+   name: tignetwork
    driver : bridge
    ipam:
       config:
@@ -160,5 +239,25 @@ networks:
 
 # docker run --rm telegraf:latest telegraf config > ./telegraf2/telegraf.conf:rw
 
+# === custom legend name =====
+# ${__series.name}.${__field.name}
+
+# https://app.slack.com/block-kit-builder/
+# curl -X POST -H 'Content-type: application/json' --data '{
+# 	"blocks": [
+# 		{
+# 			"type": "section",
+# 			"text": {
+# 				"type": "mrkdwn",
+# 				"text": "Alert test"
+# 			}
+# 		},
+# 		{
+# 			"type": "image",
+# 			"image_url": "D:\VSCODE\Docker_Project\DockerTIG\grafana\png\PJa4b67QHodGRDZR3P4P.png",
+# 			"alt_text": "inspiration"
+# 		}
+# 	]
+# }' https://hooks.slack.com/services/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
 
 

@@ -4,3 +4,4 @@ influxdb
 influxdb2
 mqtt/data
 mqtt/log
+portainer/*
